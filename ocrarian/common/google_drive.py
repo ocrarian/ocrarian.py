@@ -8,15 +8,16 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 
-from ocrarian import WORK_DIR
 from ocrarian.common.export_types import Types
+from ocrarian.common.config import Config
 
 
 class GdriveClient:
     """Google Drive client"""
 
-    def __init__(self):
-        self._token_file = Path(f"{WORK_DIR}/token.pickle")
+    def __init__(self, config: Config):
+        self.config = config
+        self._token_file = Path(f"{self.config.user_config_dir}/token.pickle")
         self._oath_scope = ["https://www.googleapis.com/auth/drive"]
         self._service = self.authenticate()
 
@@ -38,7 +39,8 @@ class GdriveClient:
                 if credentials.expired and credentials.refresh_token:
                     credentials.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(f'{WORK_DIR}/client_secret.json', self._oath_scope)
+            flow = InstalledAppFlow.from_client_secrets_file(
+                f'{self.config.user_config_dir}/client_secret.json', self._oath_scope)
             credentials = flow.run_console(port=0)
         self.save_token(credentials)
         return build('drive', 'v3', credentials=credentials, cache_discovery=False)
@@ -54,10 +56,10 @@ class GdriveClient:
         while uploaded is None:
             _, uploaded = file.next_chunk()
         # Convert to text
-        txt_file = Path(f"{file_path.stem}.txt")
+        txt_file = Path(f"{self.config.user_docs_dir}/{file_path.stem}.txt").absolute()
         download = MediaIoBaseDownload(
-            FileIO(f"{WORK_DIR}/{txt_file.name}", 'wb'),
-            self._service.files().export_media(fileId=uploaded['id'], mimeType=Types.TXT)
+            FileIO(txt_file, 'wb'),
+            self._service.files().export_media(fileId=uploaded['id'], mimeType=Types.TXT.value)
         )
         downloaded, status = False, False
         while downloaded is False:
