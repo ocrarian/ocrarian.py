@@ -3,7 +3,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 
 from ocrarian import WORK_DIR
-from ocrarian.classes.google_drive import GdriveClient
+from ocrarian.common.google_drive import GdriveClient
 
 
 def main():

@@ -3,12 +3,13 @@ import pickle
 from io import FileIO
 from pathlib import Path
 
-from ocrarian import WORK_DIR
-
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
+
+from ocrarian import WORK_DIR
+from ocrarian.common.export_types import Types
 
 
 class GdriveClient:
@@ -47,7 +48,7 @@ class GdriveClient:
         mime_type = 'application/vnd.google-apps.document'
         file_metadata = {'name': file_path.name, 'mimeType': mime_type}
         media_body = MediaFileUpload(file_path, mimetype=mime_type,
-                                     resumable=True, chunksize=50 * 1024 * 1024)
+                                     resumable=True, chunksize=5 * 1024 * 1024)
         file = self._service.files().create(body=file_metadata, media_body=media_body)
         uploaded = None
         while uploaded is None:
@@ -56,7 +57,7 @@ class GdriveClient:
         txt_file = Path(f"{file_path.stem}.txt")
         download = MediaIoBaseDownload(
             FileIO(f"{WORK_DIR}/{txt_file.name}", 'wb'),
-            self._service.files().export_media(fileId=uploaded['id'], mimeType="text/plain")
+            self._service.files().export_media(fileId=uploaded['id'], mimeType=Types.TXT)
         )
         downloaded, status = False, False
         while downloaded is False:
