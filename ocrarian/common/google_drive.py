@@ -34,16 +34,26 @@ class GdriveClient:
     def authenticate(self):
         """authenticate google drive using oauth or refresh token"""
         if self._token_file.exists():
-            credentials = self.load_token()
-            if credentials is None or not credentials.valid:
-                if credentials.expired and credentials.refresh_token:
-                    credentials.refresh(Request())
+            credentials = self.refresh_token()
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                f'{self.config.user_config_dir}/client_secret.json', self._oath_scope)
-            credentials = flow.run_console(port=0)
+            credentials = self.create_token()
         self.save_token(credentials)
         return build('drive', 'v3', credentials=credentials, cache_discovery=False)
+
+    def refresh_token(self):
+        """refresh google drive oauth token"""
+        credentials = self.load_token()
+        if credentials is None or not credentials.valid:
+            if credentials.expired and credentials.refresh_token:
+                credentials.refresh(Request())
+        return credentials
+
+    def create_token(self):
+        """authorize google drive for the first time"""
+        flow = InstalledAppFlow.from_client_secrets_file(
+            f'{self.config.user_config_dir}/client_secret.json', self._oath_scope)
+        credentials = flow.run_console(port=0)
+        return credentials
 
     def ocr(self, file_path: Path):
         """upload a file to Google Drive then export the uploaded file to a text file"""
