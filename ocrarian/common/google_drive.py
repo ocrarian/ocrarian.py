@@ -57,6 +57,8 @@ class GdriveClient:
 
     def ocr(self, file_path: Path):
         """upload a file to Google Drive then export the uploaded file to a text file"""
+        # pylint: disable=no-member
+        # Instance of 'Resource' has no 'files' member (no-member)
         mime_type = 'application/vnd.google-apps.document'
         file_metadata = {'name': file_path.name, 'mimeType': mime_type}
         media_body = MediaFileUpload(file_path, mimetype=mime_type,
@@ -70,7 +72,8 @@ class GdriveClient:
         download = MediaIoBaseDownload(
             FileIO(txt_file, 'wb'),
             self._service.files().export_media(
-                fileId=uploaded['id'], mimeType=Types[self.config['settings']['export_format']].value)
+                fileId=uploaded['id'],
+                mimeType=Types[self.config['settings']['export_format']].value)
         )
         downloaded, status = False, False
         while downloaded is False:

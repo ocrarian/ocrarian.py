@@ -1,1 +1,2 @@
-app_name = __package__
+"""Initalize"""
+APP_NAME = __package__

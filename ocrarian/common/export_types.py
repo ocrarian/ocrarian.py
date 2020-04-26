@@ -1,3 +1,4 @@
+"""Google Docs API available export types implementation"""
 from enum import Enum
 
 
