@@ -33,7 +33,8 @@ class Config(AppDirs):
 
     def load_config(self):
         config = ConfigParser()
-        return config.read(self.user_config_dir / "config.ini")
+        config.read(self.user_config_dir / "config.ini")
+        return config
 
     def create_config(self):
         new_config = ConfigParser()

@@ -59,7 +59,8 @@ class GdriveClient:
         txt_file = Path(f"{self.config.user_docs_dir}/{file_path.stem}.txt").absolute()
         download = MediaIoBaseDownload(
             FileIO(txt_file, 'wb'),
-            self._service.files().export_media(fileId=uploaded['id'], mimeType=Types.TXT.value)
+            self._service.files().export_media(
+                fileId=uploaded['id'], mimeType=Types[self.config['settings']['export_format']].value)
         )
         downloaded, status = False, False
         while downloaded is False:
