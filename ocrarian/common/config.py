@@ -4,13 +4,15 @@ from configparser import ConfigParser
 from appdirs import AppDirs
 
 from ocrarian import APP_NAME
-from ocrarian.common.exceptions import MissingClientSecretsFile
+from ocrarian.common.exceptions import MissingClientSecretsFile, IncorrectExportFormat
+from ocrarian.common.export_types import Types
 
 
 class Config(AppDirs):
     """Config class for ocrarian
     This class is responsible for creating configuration directory and settings file.
     It also handles settings load, save and delete."""
+
     def __init__(self):
         super().__init__(appname=APP_NAME)
         self.user_docs_dir = Path("~/Documents").expanduser()
@@ -21,6 +23,7 @@ class Config(AppDirs):
             self._config = self.load_config()
         else:
             self._config = self.create_config()
+        self.review_config()
 
     def create_directories(self):
         """Create config and docs directories."""
@@ -62,6 +65,14 @@ class Config(AppDirs):
                 new_config.write(config_file)
             else:
                 self._config.write(config_file)
+
+    def review_config(self):
+        """Ensure that configuration is valid."""
+        # export_format
+        chosen_export_format = self._config['settings']['export_format']
+        vaild_export_format = [i for i in Types if i.name == chosen_export_format]
+        if not vaild_export_format:
+            raise IncorrectExportFormat(chosen_export_format, [i.name for i in Types])
 
     def __getitem__(self, name):
         """Get the value of a setting."""
