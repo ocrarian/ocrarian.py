@@ -1,39 +1,26 @@
 """ocrarian config"""
-from pathlib import Path
 from configparser import ConfigParser
-from appdirs import AppDirs
 
-from ocrarian import APP_NAME
-from ocrarian.common.exceptions import MissingClientSecretsFile, IncorrectExportFormat
-from ocrarian.common.export_types import Types
+from ocrarian.common.gdocs_client.exceptions import MissingClientSecretsFile, IncorrectExportFormat
+from ocrarian.common.types.export_types import ExportTypes
 
 
-class Config(AppDirs):
+class Settings:
     """Config class for ocrarian
     This class is responsible for creating configuration directory and settings file.
     It also handles settings load, save and delete."""
 
-    def __init__(self):
-        super().__init__(appname=APP_NAME)
-        self.user_docs_dir = Path("~/Documents").expanduser()
-        self.create_directories()
+    def __init__(self, user_config_dir, user_docs_dir):
+        self.user_config_dir = user_config_dir
+        self.user_docs_dir = user_docs_dir
         self.check_client_secret()
+        self.export_format = None
         self._config_path = self.check_config()
         if self._config_path:
             self._config = self.load_config()
         else:
             self._config = self.create_config()
         self.review_config()
-
-    def create_directories(self):
-        """Create config and docs directories."""
-        # pylint: disable=no-member
-        # Instance of 'user_config_dir' has no 'exists' member (no-member)
-        # Instance of 'user_config_dir' has no 'mkdir' member (no-member)
-        if not self.user_config_dir.exists():
-            self.user_config_dir.mkdir()
-        if not self.user_docs_dir.exists():
-            self.user_docs_dir.mkdir()
 
     def check_client_secret(self):
         """Check that client_secret.json is available in user_config_dir."""
@@ -70,9 +57,10 @@ class Config(AppDirs):
         """Ensure that configuration is valid."""
         # export_format
         chosen_export_format = self._config['settings']['export_format']
-        vaild_export_format = [i for i in Types if i.name == chosen_export_format]
+        vaild_export_format = [i for i in ExportTypes if i.name == chosen_export_format]
         if not vaild_export_format:
-            raise IncorrectExportFormat(chosen_export_format, [i.name for i in Types])
+            raise IncorrectExportFormat(chosen_export_format, [i.name for i in ExportTypes])
+        self.export_format = chosen_export_format
 
     def __getitem__(self, name):
         """Get the value of a setting."""

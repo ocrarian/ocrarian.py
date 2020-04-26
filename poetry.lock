@@ -10,6 +10,7 @@ version = "1.4.4"
 reference = "4ee85402df5aa1e50ab44cecbb43b09843718057"
 type = "git"
 url = "https://github.com/Qu4tro/appdirs"
+
 [[package]]
 category = "main"
 description = "Extensible memoizing collections and decorators"
@@ -33,6 +34,14 @@ name = "chardet"
 optional = false
 python-versions = "*"
 version = "3.0.4"
+
+[[package]]
+category = "main"
+description = "Infer file type and MIME type of any file/buffer. No external dependencies."
+name = "filetype"
+optional = false
+python-versions = "*"
+version = "1.0.6"
 
 [[package]]
 category = "main"
@@ -190,6 +199,14 @@ pyasn1 = ">=0.4.6,<0.5.0"
 
 [[package]]
 category = "main"
+description = "PDF toolkit"
+name = "pypdf2"
+optional = false
+python-versions = "*"
+version = "1.26.0"
+
+[[package]]
+category = "main"
 description = "World timezone definitions, modern and historical"
 name = "pytz"
 optional = false
@@ -270,7 +287,7 @@ secure = ["certifi", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "pyOpenSSL (>=0
 socks = ["PySocks (>=1.5.6,<1.5.7 || >1.5.7,<2.0)"]
 
 [metadata]
-content-hash = "d82688142406bcda1c70226700b86b0e52791426c9a426a11f208c2e8d2bd7cf"
+content-hash = "868d75141909f74ebf90332046f62f50457da9775f91406e8193e577fc81639d"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -286,6 +303,10 @@ certifi = [
 chardet = [
     {file = "chardet-3.0.4-py2.py3-none-any.whl", hash = "sha256:fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691"},
     {file = "chardet-3.0.4.tar.gz", hash = "sha256:84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae"},
+]
+filetype = [
+    {file = "filetype-1.0.6-py2.py3-none-any.whl", hash = "sha256:fd6d0ec56820acccf8c9fb6c3ba7e04a302f6ff6c70bcc09daf4842ae9e2ac30"},
+    {file = "filetype-1.0.6.tar.gz", hash = "sha256:99d2b923921cadbe6e451249091ca7156b4beaee6e741bd711a582d4dd2f2881"},
 ]
 google-api-core = [
     {file = "google-api-core-1.17.0.tar.gz", hash = "sha256:e4082a0b479dc2dee2f8d7b80ea8b5d0184885b773caab15ab1836277a01d689"},
@@ -372,6 +393,9 @@ pyasn1-modules = [
     {file = "pyasn1_modules-0.2.8-py3.5.egg", hash = "sha256:426edb7a5e8879f1ec54a1864f16b882c2837bfd06eee62f2c982315ee2473ed"},
     {file = "pyasn1_modules-0.2.8-py3.6.egg", hash = "sha256:cbac4bc38d117f2a49aeedec4407d23e8866ea4ac27ff2cf7fb3e5b570df19e0"},
     {file = "pyasn1_modules-0.2.8-py3.7.egg", hash = "sha256:c29a5e5cc7a3f05926aff34e097e84f8589cd790ce0ed41b67aed6857b26aafd"},
+]
+pypdf2 = [
+    {file = "PyPDF2-1.26.0.tar.gz", hash = "sha256:e28f902f2f0a1603ea95ebe21dff311ef09be3d0f0ef29a3e44a932729564385"},
 ]
 pytz = [
     {file = "pytz-2019.3-py2.py3-none-any.whl", hash = "sha256:1c557d7d0e871de1f5ccd5833f60fb2550652da6be2693c1e02300743d21500d"},

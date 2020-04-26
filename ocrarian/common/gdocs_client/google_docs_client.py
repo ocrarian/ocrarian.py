@@ -1,4 +1,4 @@
-"""Google Drive client implementation"""
+"""Google Docs client implementation"""
 import pickle
 from io import FileIO
 from pathlib import Path
@@ -8,14 +8,14 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 
-from ocrarian.common.export_types import Types
-from ocrarian.common.config import Config
+from ocrarian.common.types.export_types import ExportTypes
+from ocrarian.common.gdocs_client.settings import Settings
 
 
-class GdriveClient:
+class GDocsClient:
     """Google Drive client"""
 
-    def __init__(self, config: Config):
+    def __init__(self, config: Settings):
         self.config = config
         self._token_file = Path(f"{self.config.user_config_dir}/token.pickle")
         self._oath_scope = ["https://www.googleapis.com/auth/drive"]
@@ -73,7 +73,7 @@ class GdriveClient:
             FileIO(txt_file, 'wb'),
             self._service.files().export_media(
                 fileId=uploaded['id'],
-                mimeType=Types[self.config['settings']['export_format']].value)
+                mimeType=ExportTypes[self.config['settings']['export_format']].value)
         )
         downloaded, status = False, False
         while downloaded is False:

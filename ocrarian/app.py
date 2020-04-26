@@ -2,8 +2,10 @@
 from argparse import ArgumentParser
 from pathlib import Path
 
-from ocrarian.common.google_drive import GdriveClient
-from ocrarian.common.config import Config
+from ocrarian.common.file_manager.config import Config
+from ocrarian.common.file_manager.file_manager import FileManager
+from ocrarian.common.gdocs_client.google_docs_client import GDocsClient
+from ocrarian.common.gdocs_client.settings import Settings
 
 
 def main():
@@ -13,12 +15,20 @@ def main():
     flags.add_argument('file', type=lambda p: Path(p).absolute(), help='PDF or Image file')
     args = flags.parse_args()
     config = Config()
-    client = GdriveClient(config)
-    pdf_file = args.file
-    ocr = client.ocr(pdf_file)
-    if ocr:
-        print(f"Text from {pdf_file} has been OCR'd successfully.\n"
-              f"Output can be found in {ocr}")
+    settings = Settings(config.user_config_dir, config.user_docs_dir)
+    client = GDocsClient(settings)
+    input_file = args.file
+    file = FileManager(config, settings.export_format, input_file)
+    if file.is_pdf:
+        parts = file.split_pdf()
+        for part in parts:
+            ocr = client.ocr(part)
+    else:
+        ocr = client.ocr(input_file)
+    out_file = file.merge()
+    if out_file:
+        print(f"Text from {input_file} has been OCR'd successfully.\n"
+              f"Output can be found in {out_file}")
 
 
 if __name__ == '__main__':
