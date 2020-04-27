@@ -1,6 +1,7 @@
 """ocrarian file manager class"""
-from glob import glob
 from pathlib import Path
+from shutil import move
+
 import filetype
 from PyPDF2 import PdfFileReader, PdfFileWriter
 
@@ -17,7 +18,10 @@ class FileManager:
         self.config = config
         self.export_format = export_format
         self.file = file
-        self.out_file = Path(f"{self.config.user_docs_dir}/{self.file.stem}.{export_format.lower()}").absolute()
+        self.out_file = Path(
+            f"{self.config.user_docs_dir}/{self.file.stem}.{export_format.lower()}").absolute()
+        self.tmp_file = Path(
+            f"{self.config.user_cache_dir}/{self.file.stem}.{export_format.lower()}").absolute()
         if not self.file.exists():
             raise FileNotFound(self.file)
         self.extension = None
@@ -36,7 +40,8 @@ class FileManager:
                               if i.name == kind.extension.upper()
                               and i.value == kind.MIME]
         if not valid_input_format:
-            raise UnsupportedFile(kind.extension.upper(), kind.MIME, [i.name for i in SupportedTypes])
+            raise UnsupportedFile(kind.extension.upper(),
+                                  kind.MIME, [i.name for i in SupportedTypes])
         self.extension = kind.extension
         return True
 
@@ -72,7 +77,8 @@ class FileManager:
                 pdf_writer = PdfFileWriter()
                 for page in range(pages_range[0] - 1, pages_range[1]):
                     pdf_writer.addPage(pdf.getPage(page))
-                output_filename = f"{self.file.parent}/{self.file.stem}_{pages_range[0]}-{pages_range[1]}.pdf"
+                output_filename = f"{self.config.user_cache_dir}/" \
+                                  f"{self.file.stem}_{pages_range[0]}-{pages_range[1]}.pdf"
                 with open(output_filename, 'wb') as out:
                     pdf_writer.write(out)
                 self.parts.append(Path(output_filename))
@@ -82,7 +88,8 @@ class FileManager:
 
     def merge(self):
         """Merge OCR output files"""
-        if len(self.parts) < 2:
+        if not self.parts:
+            move(self.tmp_file, self.out_file)
             return self.out_file
         if self.export_format == "TXT":
             self.merge_txt()
@@ -90,12 +97,19 @@ class FileManager:
 
     def merge_txt(self):
         """Merge text files into a single text file."""
-        out_files = sorted([i for i in self.out_file.parent.iterdir()
-                            if i.is_file() and str(i.name).startswith(f"{self.out_file.stem}_")],
+        out_files = sorted([i for i in self.config.user_cache_dir.iterdir()
+                            if i.is_file() and str(i.name).startswith(f"{self.out_file.stem}_")
+                            and str(i.name).endswith(self.out_file.suffix)],
                            key=lambda x: int(x.name.split('_')[-1].split('-')[0]))
 
-        with open(self.out_file, "w") as out:
+        with open(self.out_file, "w", encoding="utf-8", newline='\n') as out:
             for part in out_files:
                 with open(str(part), "r") as file:
                     out.write(file.read())
                 part.unlink()
+
+    def cleanup(self):
+        """Cleanup temporary files"""
+        if self.parts:
+            for item in self.config.user_cache_dir.iterdir():
+                item.unlink()

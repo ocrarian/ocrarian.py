@@ -16,8 +16,8 @@ class GDocsClient:
     """Google Drive client"""
 
     def __init__(self, config: Settings):
-        self.config = config
-        self._token_file = Path(f"{self.config.user_config_dir}/token.pickle")
+        self.settings = config
+        self._token_file = Path(f"{self.settings.storage_config.user_config_dir}/token.pickle")
         self._oath_scope = ["https://www.googleapis.com/auth/drive"]
         self._service = self.authenticate()
 
@@ -51,7 +51,7 @@ class GDocsClient:
     def create_token(self):
         """authorize google drive for the first time"""
         flow = InstalledAppFlow.from_client_secrets_file(
-            f'{self.config.user_config_dir}/client_secret.json', self._oath_scope)
+            f'{self.settings.user_config_dir}/client_secret.json', self._oath_scope)
         credentials = flow.run_console(port=0)
         return credentials
 
@@ -68,12 +68,12 @@ class GDocsClient:
         while uploaded is None:
             _, uploaded = file.next_chunk()
         # Convert to text
-        txt_file = Path(f"{self.config.user_docs_dir}/{file_path.stem}.txt").absolute()
+        txt_file = Path(f"{self.settings.storage_config.user_cache_dir}/{file_path.stem}.txt").absolute()
         download = MediaIoBaseDownload(
             FileIO(txt_file, 'wb'),
             self._service.files().export_media(
                 fileId=uploaded['id'],
-                mimeType=ExportTypes[self.config['settings']['export_format']].value)
+                mimeType=ExportTypes[self.settings['settings']['export_format']].value)
         )
         downloaded, status = False, False
         while downloaded is False:

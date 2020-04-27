@@ -15,7 +15,7 @@ def main():
     flags.add_argument('file', type=lambda p: Path(p).absolute(), help='PDF or Image file')
     args = flags.parse_args()
     config = Config()
-    settings = Settings(config.user_config_dir, config.user_docs_dir)
+    settings = Settings(config)
     client = GDocsClient(settings)
     input_file = args.file
     file = FileManager(config, settings.export_format, input_file)
@@ -26,6 +26,7 @@ def main():
     else:
         ocr = client.ocr(input_file)
     out_file = file.merge()
+    file.cleanup()
     if out_file:
         print(f"Text from {input_file} has been OCR'd successfully.\n"
               f"Output can be found in {out_file}")

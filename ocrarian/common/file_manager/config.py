@@ -24,3 +24,5 @@ class Config(AppDirs):
             self.user_config_dir.mkdir()
         if not self.user_docs_dir.exists():
             self.user_docs_dir.mkdir()
+        if not self.user_cache_dir.exists():
+            self.user_cache_dir.mkdir()
