@@ -26,8 +26,8 @@ class FileManager:
             raise FileNotFound(self.file)
         self.extension = None
         self.is_supported()
-        self.is_pdf = None
-        self.is_image = None
+        self.is_pdf = False
+        self.is_image = False
         self.set_type()
         self.parts = []
 
@@ -49,26 +49,24 @@ class FileManager:
         """Set the given file type property."""
         if self.extension == "pdf":
             self.is_pdf = True
-            self.is_image = False
         else:
             self.is_image = True
-            self.is_pdf = False
 
     def split_pdf(self):
         """Split PDF file into smaller pieces
         Since Google Docs support PDF to text conversion for files less than 80 pages,
-        it's safer to split the PDF file into a smaller piece (75 pages per part)"""
+        it's safer to split the PDF file into a smaller piece (20 pages per part)"""
         pdf = PdfFileReader(str(self.file))
         pages_count = pdf.getNumPages()
-        if pages_count > 75:
+        if pages_count > 20:
             ranges = []
             to_split = pages_count
             processed = 0
             while processed != pages_count:
-                if to_split - 75 > 0:
-                    ranges.append((processed + 1, processed + 75))
-                    to_split = to_split - 75
-                    processed = processed + 75
+                if to_split - 20 > 0:
+                    ranges.append((processed + 1, processed + 20))
+                    to_split = to_split - 20
+                    processed = processed + 20
                 else:
                     ranges.append((processed + 1, pages_count))
                     to_split = 0
