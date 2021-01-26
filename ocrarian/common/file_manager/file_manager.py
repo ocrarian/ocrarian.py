@@ -99,7 +99,8 @@ class FileManager:
                             if i.is_file() and str(i.name).startswith(f"{self.out_file.stem}_")
                             and str(i.name).endswith(self.out_file.suffix)],
                            key=lambda x: int(x.name.split('_')[-1].split('-')[0]))
-
+        # TODO: Handle PermissionError: [WinError 5] Access is denied on Windows 10
+        # A temporary workaround is to allow python from controlled access in windows security.
         with open(self.out_file, "w", encoding="utf-8", newline='\n') as out:
             for part in out_files:
                 with open(str(part), "r") as file:

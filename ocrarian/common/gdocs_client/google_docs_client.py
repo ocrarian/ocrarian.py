@@ -51,7 +51,7 @@ class GDocsClient:
     def create_token(self):
         """authorize google drive for the first time"""
         flow = InstalledAppFlow.from_client_secrets_file(
-            f'{self.settings.user_config_dir}/client_secret.json', self._oath_scope)
+            f'{self.settings.storage_config.user_config_dir}/client_secret.json', self._oath_scope)
         credentials = flow.run_console(port=0)
         return credentials
 
