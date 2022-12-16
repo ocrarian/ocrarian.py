@@ -1,7 +1,8 @@
 """ocrarian config"""
 from configparser import ConfigParser
 
-from ocrarian.common.gdocs_client.exceptions import MissingClientSecretsFile, IncorrectExportFormat
+from ocrarian.common.gdocs_client.exceptions import MissingClientSecretsFile, IncorrectExportFormat, IncorrectAuthMethod
+from ocrarian.common.types.auth_methods import AuthenticationMethods
 from ocrarian.common.types.export_types import ExportTypes
 
 
@@ -14,6 +15,7 @@ class Settings:
         self.storage_config = storage_config
         self.check_client_secret()
         self.export_format = None
+        self.authentication_method = None
         self._config_path = self.check_config()
         if self._config_path:
             self._config = self.load_config()
@@ -42,6 +44,7 @@ class Settings:
         new_config = ConfigParser()
         new_config['settings'] = {}
         new_config['settings']['export_format'] = 'TXT'
+        new_config['settings']['authentication'] = 'SERVICE_ACCOUNT'
         self.save_config(new_config)
         return new_config
 
@@ -57,10 +60,13 @@ class Settings:
         """Ensure that configuration is valid."""
         # export_format
         chosen_export_format = self._config['settings']['export_format']
-        vaild_export_format = [i for i in ExportTypes if i.name == chosen_export_format]
-        if not vaild_export_format:
+        if not any([chosen_export_format == i.name for i in ExportTypes]):
             raise IncorrectExportFormat(chosen_export_format, [i.name for i in ExportTypes])
         self.export_format = chosen_export_format
+        chosen_authentication_method = self._config['settings']['authentication']
+        if not any([chosen_authentication_method == i.name for i in AuthenticationMethods]):
+            raise IncorrectAuthMethod(chosen_authentication_method, [i.name for i in AuthenticationMethods])
+        self.authentication_method = chosen_authentication_method
 
     def __getitem__(self, name):
         """Get the value of a setting."""

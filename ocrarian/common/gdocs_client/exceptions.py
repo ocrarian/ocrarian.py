@@ -28,6 +28,19 @@ class IncorrectExportFormat(Exception):
                f"export_format must be one of {self.available_formats}"
 
 
+class IncorrectAuthMethod(Exception):
+    """Exception raised when an incorrect authentication method is configured."""
+
+    def __init__(self, incorrect_auth_method, available_methods):
+        super().__init__(self)
+        self.incorrect_auth_method = incorrect_auth_method
+        self.available_methods = available_methods
+
+    def __str__(self):
+        return f"{self.incorrect_auth_method} is an incorrect authentication method! " \
+               f"authentication must be one of {self.available_methods}"
+
+
 class FileNotFound(Exception):
     """Exception raised when file type cannot be determined."""
 
